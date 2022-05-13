@@ -1,7 +1,5 @@
 import WebGL from "three/examples/jsm/capabilities/WebGL.js";
 import { Viewer } from "./viewer.js";
-import { SimpleDropzone } from "simple-dropzone";
-import { ValidationController } from "./validation-controller.js";
 import queryString from "query-string";
 
 if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
@@ -32,7 +30,6 @@ class App {
     // this.spinnerEl = el.querySelector(".spinner");
     this.dropEl = el.querySelector(".dropzone");
     this.inputEl = el.querySelector("#file-input");
-    this.validationCtrl = new ValidationController(el);
 
     this.view(
       "https://alta-s3.dev-altamedia.com/nutifood/productImage/1778762879_bo-khoai-tay.glb",
@@ -123,11 +120,7 @@ class App {
     // console.debug("rootPath", rootPath);
     // console.debug("File map", fileMap);
     // https://alta-s3.dev-altamedia.com/nutifood/productImage/1778762879_bo-khoai-tay.glb
-    viewer
-      .load(
-        "https://alta-s3.dev-altamedia.com/nutifood/productImage/1778762879_bo-khoai-tay.glb"
-      )
-      .catch((e) => this.onError(e));
+    viewer.load(rootFile).catch((e) => this.onError(e));
     // .then((gltf) => {
     //   if (!this.options.kiosk) {
     //     this.validationCtrl.validate(fileURL, rootPath, fileMap, gltf);
