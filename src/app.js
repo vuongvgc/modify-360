@@ -1,18 +1,7 @@
-import WebGL from "three/examples/jsm/capabilities/WebGL.js";
 import { Viewer } from "./viewer.js";
 import queryString from "query-string";
 
-if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
-  console.error("The File APIs are not fully supported in this browser.");
-} else if (!WebGL.isWebGLAvailable()) {
-  console.error("WebGL is not supported in this browser.");
-}
-
 class App {
-  /**
-   * @param  {Element} el
-   * @param  {Location} location
-   */
   constructor(el, location) {
     const hash = location.hash ? queryString.parse(location.hash) : {};
     this.options = {
@@ -27,14 +16,12 @@ class App {
     this.el = el;
     this.viewer = null;
     this.viewerEl = null;
-    // this.spinnerEl = el.querySelector(".spinner");
-    this.dropEl = el.querySelector(".dropzone");
+    this.viewBoxEl = el.querySelector(".view__box");
 
     this.view(
       "https://alta-s3.dev-altamedia.com/nutifood/productImage/1778762879_bo-khoai-tay.glb",
       ""
     );
-    // this.hideSpinner();
 
     const options = this.options;
 
@@ -48,110 +35,20 @@ class App {
     }
   }
 
-  /**
-   * Sets up the drag-and-drop controller.
-   */
-  // createDropzone() {
-  //   console.debug("this", this.inputEl);
-  //   const dropCtrl = new SimpleDropzone(this.dropEl, this.inputEl);
-  //   dropCtrl.on("drop", ({ files }) => {
-  //     console.debug("file", files);
-  //     this.load(files);
-  //   });
-  //   // dropCtrl.on("dropstart", () => this.showSpinner());
-  //   // dropCtrl.on("droperror", () => this.hideSpinner());
-  // }
-
-  /**
-   * Sets up the view manager.
-   * @return {Viewer}
-   */
   createViewer() {
     this.viewerEl = document.createElement("div");
     this.viewerEl.classList.add("viewer");
-    this.dropEl.innerHTML = "";
-    this.dropEl.appendChild(this.viewerEl);
+    this.viewBoxEl.innerHTML = "";
+    this.viewBoxEl.appendChild(this.viewerEl);
     this.viewer = new Viewer(this.viewerEl, this.options);
     return this.viewer;
   }
 
-  /**
-   * Loads a fileset provided by user action.
-   * @param  {Map<string, File>} fileMap
-   */
-  // load(fileMap) {
-  //   let rootFile;
-  //   let rootPath;
-  //   Array.from(fileMap).forEach(([path, file]) => {
-  //     if (file.name.match(/\.(gltf|glb)$/)) {
-  //       rootFile = file;
-  //       rootPath = path.replace(file.name, "");
-  //     }
-  //   });
-
-  //   if (!rootFile) {
-  //     this.onError("No .gltf or .glb asset found.");
-  //   }
-  //   console.debug("rootFile", rootFile);
-  //   console.debug("rootPath", rootPath);
-  //   console.debug("File map", fileMap);
-  //   this.view(rootFile, rootPath, fileMap);
-  // }
-
-  /**
-   * Passes a model to the viewer, given file and resources.
-   * @param  {File|string} rootFile
-   * @param  {string} rootPath
-   * @param  {Map<string, File>} fileMap
-   */
   view(rootFile) {
     if (this.viewer) this.viewer.clear();
     const viewer = this.viewer || this.createViewer();
-
-    // const fileURL =
-    //   typeof rootFile === "string" ? rootFile : URL.createObjectURL(rootFile);
-
-    // const cleanup = () => {
-    //   this.hideSpinner();
-    //   if (typeof rootFile === "object") URL.revokeObjectURL(fileURL);
-    // };
-    // console.debug("fileURL", fileURL);
-    // console.debug("rootPath", rootPath);
-    // console.debug("File map", fileMap);
-    // https://alta-s3.dev-altamedia.com/nutifood/productImage/1778762879_bo-khoai-tay.glb
-    viewer.load(rootFile).catch((e) => this.onError(e));
-    // .then((gltf) => {
-    //   if (!this.options.kiosk) {
-    //     this.validationCtrl.validate(fileURL, rootPath, fileMap, gltf);
-    //   }
-    //   cleanup();
-    // });
+    viewer.load(rootFile).catch((e) => console.log(e));
   }
-
-  /**
-   * @param  {Error} error
-   */
-  onError(error) {
-    let message = (error || {}).message || error.toString();
-    if (message.match(/ProgressEvent/)) {
-      message =
-        "Unable to retrieve this file. Check JS console and browser network tab.";
-    } else if (message.match(/Unexpected token/)) {
-      message = `Unable to parse file content. Verify that this file is valid. Error: "${message}"`;
-    } else if (error && error.target && error.target instanceof Image) {
-      message = "Missing texture: " + error.target.src.split("/").pop();
-    }
-    window.alert(message);
-    console.error(error);
-  }
-
-  // showSpinner() {
-  //   this.spinnerEl.style.display = "";
-  // }
-
-  // hideSpinner() {
-  //   this.spinnerEl.style.display = "none";
-  // }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
