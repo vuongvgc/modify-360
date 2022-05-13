@@ -29,7 +29,6 @@ class App {
     this.viewerEl = null;
     // this.spinnerEl = el.querySelector(".spinner");
     this.dropEl = el.querySelector(".dropzone");
-    this.inputEl = el.querySelector("#file-input");
 
     this.view(
       "https://alta-s3.dev-altamedia.com/nutifood/productImage/1778762879_bo-khoai-tay.glb",
