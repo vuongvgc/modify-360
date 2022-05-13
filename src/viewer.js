@@ -45,8 +45,6 @@ const KTX2_LOADER = new KTX2Loader(MANAGER).setTranscoderPath(
 
 const IS_IOS = isIOS();
 
-// glTF texture types. `envMap` is deliberately omitted, as it's used internally
-// by the loader but not part of the glTF format.
 const MAP_NAMES = [
   "map",
   "aoMap",
@@ -178,15 +176,6 @@ export class Viewer {
     this.render();
 
     this.prevTime = time;
-  }
-
-  render() {
-    this.renderer.render(this.scene, this.activeCamera);
-    if (this.state.grid) {
-      this.axesCamera.position.copy(this.defaultCamera.position);
-      this.axesCamera.lookAt(this.axesScene.position);
-      this.axesRenderer.render(this.axesScene, this.axesCamera);
-    }
   }
 
   resize() {
@@ -528,11 +517,6 @@ export class Viewer {
     this.vignette.style({ colors: [this.state.bgColor1, this.state.bgColor2] });
   }
 
-  /**
-   * Adds AxesHelper.
-   *
-   * See: https://stackoverflow.com/q/16226693/1314762
-   */
   addAxesHelper() {
     this.axesDiv = document.createElement("div");
     this.el.appendChild(this.axesDiv);
@@ -746,6 +730,14 @@ export class Viewer {
         if (material[map]) material[map].dispose();
       });
     });
+  }
+  render() {
+    this.renderer.render(this.scene, this.activeCamera);
+    if (this.state.grid) {
+      this.axesCamera.position.copy(this.defaultCamera.position);
+      this.axesCamera.lookAt(this.axesScene.position);
+      this.axesRenderer.render(this.axesScene, this.axesCamera);
+    }
   }
 }
 
