@@ -29,7 +29,6 @@ import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 
 import { GUI } from "dat.gui";
 
-import { environments } from "../assets/environment/index.js";
 import { createBackground } from "../lib/three-vignette.js";
 
 const DEFAULT_CAMERA = "[default]";
@@ -72,11 +71,6 @@ export class Viewer {
     this.gui = null;
 
     this.state = {
-      environment:
-        options.preset === Preset.ASSET_GENERATOR
-          ? environments.find((e) => e.id === "footprint-court").name
-          : environments[1].name,
-      background: true,
       playbackSpeed: 1.0,
       actionStates: {},
       camera: DEFAULT_CAMERA,
@@ -121,7 +115,7 @@ export class Viewer {
     this.renderer = window.renderer = new WebGLRenderer({ antialias: true });
     this.renderer.physicallyCorrectLights = true;
     this.renderer.outputEncoding = sRGBEncoding;
-    this.renderer.setClearColor(0xcccccc);
+    this.renderer.setClearColor(0x000000, 0);
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(el.clientWidth, el.clientHeight);
 
@@ -435,30 +429,8 @@ export class Viewer {
     this.lights.length = 0;
   }
 
-  updateEnvironment() {
-    const environment = environments.filter(
-      (entry) => entry.name === this.state.environment
-    )[0];
-
-    this.getCubeMapTexture(environment).then(({ envMap }) => {
-      if (
-        (!envMap || !this.state.background) &&
-        this.activeCamera === this.defaultCamera
-      ) {
-        this.scene.add(this.vignette);
-      } else {
-        this.scene.remove(this.vignette);
-      }
-
-      this.scene.environment = envMap;
-      this.scene.background = this.state.background ? envMap : null;
-    });
-  }
-
   getCubeMapTexture(environment) {
     const { path } = environment;
-
-    // no envmap
     if (!path) return Promise.resolve({ envMap: null });
 
     return new Promise((resolve, reject) => {
@@ -553,11 +525,7 @@ export class Viewer {
       width: 260,
       hideable: true,
     }));
-
-    // Display controls.
     const dispFolder = gui.addFolder("Display");
-    const envBackgroundCtrl = dispFolder.add(this.state, "background");
-    envBackgroundCtrl.onChange(() => this.updateEnvironment());
     const wireframeCtrl = dispFolder.add(this.state, "wireframe");
     wireframeCtrl.onChange(() => this.updateDisplay());
     const skeletonCtrl = dispFolder.add(this.state, "skeleton");
@@ -589,12 +557,6 @@ export class Viewer {
           material.needsUpdate = true;
         });
       });
-    const envMapCtrl = lightFolder.add(
-      this.state,
-      "environment",
-      environments.map((env) => env.name)
-    );
-    envMapCtrl.onChange(() => this.updateEnvironment());
     [
       lightFolder.add(this.state, "exposure", 0, 2),
       lightFolder.add(this.state, "addLights").listen(),
